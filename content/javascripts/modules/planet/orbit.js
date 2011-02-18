@@ -7,7 +7,7 @@ db.moz.plugin.modules.register({
   // module description
   module_name:        'orbit',
   module_author:      'rds12',
-  module_version:     '2010-05-07',
+  module_version:     '2011-02-17',
   module_website:     'http://db.wiki.seiringer.eu',
   module_enable:      true,
 
@@ -42,7 +42,11 @@ db.moz.plugin.modules.register({
 
       this.shortcuts[value] = name;
       this.commands[name] = value;
+      name = null;
+      value = null;
     }
+    branch = null;
+    childs = null;
   },
 
   get_overview_bar: function(){
@@ -57,42 +61,11 @@ db.moz.plugin.modules.register({
     if(!header.length)header = $('#message .messageBox_Middle');
 
     header.wrapInner(this.template('overviewBar'));
+    header = null;
 
     return $('#dbMozPluginOrbitOverviewBar');
   },
 
-  /**
-   * // get all ships:
-   *
-   * var ships = get_ships();
-   * 
-   * // get the first ship or no ship:
-   * 
-   * var ship = get_ships({
-   *   range: {start: 0, end: 1}
-   * });
-   * 
-   * // get all unselected ships
-   * 
-   * var ship = get_ships({
-   *   filter: 'unselected'
-   * });
-   * 
-   * // get all selected ships
-   * 
-   * var ship = get_ships({
-   *   filter: 'selected'
-   * });
-   * 
-   * // get all unselected ships, where the index is greter than 3
-   * 
-   * var ship = get_ships({
-   *   filter: 'unselected'
-   *   range: {start: 4}
-   * });
-   * 
-   * @return {jQuery} jQuery of td entries
-   */
   get_ships: function(options){
     const $ = this.od.jQuery;
     const self = this;
@@ -113,6 +86,7 @@ db.moz.plugin.modules.register({
 
       start = range.start;
       end   = range.end;
+      range = null;
 
       // if start and end position is invalid
       // return true
@@ -204,6 +178,7 @@ db.moz.plugin.modules.register({
         if(selected){
           stack.push(ship);
         }
+        selected = null;
 
         // abort collection if exceeded!
         if(exceeded){
@@ -231,6 +206,7 @@ db.moz.plugin.modules.register({
                ship.hasClass('tabletrans');
       });
     }
+    filter = null;
     
     // if no valid settings are found, return all ships
     // or return matched ships
