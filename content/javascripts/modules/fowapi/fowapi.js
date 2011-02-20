@@ -299,7 +299,7 @@ db.moz.plugin.modules.register({
           match[1] += '<br><br>' + orbitText;
 
         // new mouseover
-        orbit.attr('onmouseover',match.join(''))
+        orbit.attr('onmouseover',match.join(''));
       }
 
       hover.attr('onmouseover',parsed.join(''));

@@ -36,9 +36,9 @@ db.moz.plugin.modules.register({
     if(!this.is_fleet_overview()) return false;
     const $ = this.od.jQuery;
     const self = this;
-    
+
     this.select_reset();
-    
+
     var element = $('input[type=checkbox][value="'+fleet_id+'"]');
     // retrieving place and time
     var place = null, time = null, counter = 0;
@@ -125,7 +125,8 @@ db.moz.plugin.modules.register({
   gui_overview_extending_checkboxes: function(){
     if(this.lib.preferences.get('preferences.fleet.dblClickSendButton') !== true)
       return;
-
+    
+    const self = this;
     const $ = this.od.jQuery;
     // create window for the dynamic send button
     $('body').append(this.template('sendWindow'));
@@ -133,7 +134,7 @@ db.moz.plugin.modules.register({
     // event select same!
     $('input:checkbox').each(function(){
       $(this).dblclick(function(e){
-    	  this.select_same($(this).val(),e);
+        self.select_same($(this).val(),e);
       });
     });
   },

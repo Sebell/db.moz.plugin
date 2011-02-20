@@ -55,6 +55,7 @@ db.moz.plugin.modules.register({
     this.gui_extending_post_symbol();
     this.gui_extending_day_tax_income();
     this.gui_extending_buildable_ships();
+    this.gui_extending_buildable_buidings();
   },
 
   retrieve_infrastructure_values: function(){
@@ -77,6 +78,7 @@ db.moz.plugin.modules.register({
     var production = function(name){
       return dom[name+'prog'] * dom[name+'faktor'] * smallish / 100;
     }
+    smallish = null;
 
     this.production.ore = production('erz');
     this.production.metal = production('metall');
@@ -86,6 +88,7 @@ db.moz.plugin.modules.register({
     this.production.credits = 0; // TODO: parse dom;
     this.production.industry = 0; // TODO: parse dom;
     this.production.research = 0; // TODO: parse dom;
+    production = null;
   },
 
   gui_extending_buildable_ships: function(){
@@ -108,18 +111,15 @@ db.moz.plugin.modules.register({
     // due to users can close and open the window more than once,
     // we have to rebind the event afterwards
 
-    var append_values = function(){
+    append_values = function(){
       $('a[onclick^=buildship]').each(function(i,e){
-        var e = $(e),
-            min = self.get_minimal_material(e);
-
-        e.parents('td:first').prepend(
-          self.template('numberBuildableShips',min));
-        e = null;
+        e = $(e);
+        e.parents('td:first').prepend(self.template('numberBuildableShips',self.get_minimal_material(e)));
+        delete e;
       });
     }
 
-    var rebind = function(){
+    rebind = function(){
       // let the event only be called once
       var window = $('#shipDialog_c');
       window.one('DOMNodeInserted',function(){
@@ -127,19 +127,50 @@ db.moz.plugin.modules.register({
         append_values();
         rebind();
       });
-      window = null;
     }
-
     rebind();
+    delete rebind,append_values;
   },
 
+  gui_extending_buildable_buidings: function(){
+    if(this.lib.preferences.get('preferences.infrastructure.buildableBuildings') !== true)
+      return;
+
+    if(this.modules.location.options['scan']) return;
+    const $ = this.od.jQuery;
+    const self = this;
+
+    var append_values = function(){
+      $('img[onclick^=planet_techklick]').each(function(i,e){
+        e = $(e);
+        min = self.get_minimal_material(e);
+
+        regex = /planet_picover\((.+?), '(.+?)', '(.+?)'\)/,
+        pic_hover = e.attr('onmouseover') || '',
+        match = pic_hover.match(regex) || [,'',''];
+        delete regex, pic_hover;
+        
+        // delete first element
+        match.shift();
+
+        match[1] = self.template('numberBuildableBuildings',min) + match[1];
+        e.attr('onmouseover','planet_picover(' + match[0] + ",'" + match[1] + "','" + match[2] + "')");
+        delete match;
+      });
+      delete e;
+    }
+    append_values();
+  },
+
+  
   get_minimal_material: function(e){
     const self = this;
-    var min = Number.MAX_VALUE;
+    min = Number.MAX_VALUE;
 
-    var ress_min = function(dividend,divisor){
-      var tmp = divisor == 0? Number.MAX_VALUE : dividend / divisor;
+    ress_min = function(dividend,divisor){
+      tmp = divisor == 0? Number.MAX_VALUE : dividend / divisor;
       min = Math.min(min,tmp);
+      delete tmp;
     }
 
     ress_min(self.deposit.credits, e.attr('credits'));
@@ -149,7 +180,7 @@ db.moz.plugin.modules.register({
     ress_min(self.deposit.tungsten, e.attr('wolfram'));
     ress_min(self.deposit.fluoride, e.attr('flour'));
 
-    ress_min = null;
+    delete ress_min;
     return min;
   },
 
@@ -157,9 +188,9 @@ db.moz.plugin.modules.register({
     var match = text.match(/(picover\(\d+,\s+')(.+?)(')/);
     if(!match) return text;
 
-    var min = this.get_minimal_material(img),
-        factor = this.template('numberBuildableShips',min);
-    min = null;
+    min = this.get_minimal_material(img);
+    factor = this.template('numberBuildableShips',min);
+    delete min;
 
     return match[1] + factor + match[2] + match[3] + ",'')";
   },
@@ -172,12 +203,11 @@ db.moz.plugin.modules.register({
     const dom = this.od.dom;
     const img = dom['old'];
     
-    var matches = /post.gif/.test(img);
+    matches = /post.gif/.test(img);
     if(!matches) return;
-    matches = null;
+    delete matches;
     
-    $('#lefttop').wrap('<div style="position:relative"/>')
-                 .parents('div:eq(0)').prepend(this.template('postsymbol',img));
+    $('#lefttop').wrap('<div style="position:relative"/>').parents('div:eq(0)').prepend(this.template('postsymbol',img));
   },
   
   gui_extending_day_tax_income: function(){
@@ -189,14 +219,12 @@ db.moz.plugin.modules.register({
     const $   = this.od.jQuery;
     const dom = this.od.dom;
     
-    var entry = $('img[src*=credits_us]:last');
+    entry = $('img[src*=credits_us]:last');
     if(!entry.length) return;
 
-    var income = this.deposit.tax * 24,
-        format = this.lib.basics.format_number;
+    income = this.deposit.tax * 24;
+    format = this.lib.basics.format_number;
     entry.next('font').find('b').append(' * 24 &rarr; '+ format(income));
-    entry = null;
-    income = null;
-    format = null;
+    delete entry,income,format;
   }
 });
