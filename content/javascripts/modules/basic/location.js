@@ -44,8 +44,14 @@ db.moz.plugin.modules.register({
     }else if(this.is_start_page()){
       this.od_undefined();
     }else{
-      // if place.op == planet than load function od_planet if defined
-      this.call(this.query.op,this.query);
+      if(this.query.url != undefined) {
+        match = this.query.url.split('/');
+        this.call(match[1],this.query);
+      } else {
+        // if place.op == planet than load function od_planet if defined
+        this.call(this.query.op,this.query);
+      }
+      
     }
 
     this.gui_extending_close_event();
@@ -68,8 +74,8 @@ db.moz.plugin.modules.register({
     if(this.lib.preferences.get('preferences.overall.closeHandler') !== true)
       return;
 
-    const win = this.od.doc;
-    const $ = this.od.jQuery;
+    win = this.od.doc;
+    $ = this.od.jQuery;
 
     // add the text '[Esc]' to all window closer
     $('a[href$=.closeDialog()]').prepend('[Esc] ');
@@ -81,18 +87,18 @@ db.moz.plugin.modules.register({
         $(e).css('visibility','hidden');
       });
     });
+    delete win,$;
   },
 
   gui_extending_disable_quickjump_overflow: function(){
     if(this.lib.preferences.get('preferences.overall.disableQuickjumpOverflow') !== true)
       return;
 
-    const $ = this.od.jQuery;
-    $('div.quickjump').css({height: '', overflow: ''});
+    this.od.jQuery('div.quickjump').css({height: '', overflow: ''});
   },
 
   od_send: function(place){
-    const $   = this.od.jQuery;
+    $ = this.od.jQuery;
     
     this.main = 'fleet';
     this.sub  = 'dispatch_menu';
@@ -103,18 +109,18 @@ db.moz.plugin.modules.register({
     if(this.options['warning']) return;
     
     //checking if fleet was dispatched
-    var dispatch = $('td#maincontent table div[style*="overflow: auto"]');
+    dispatch = $('td#maincontent table div[style*="overflow: auto"]');
     if(dispatch.length){
       this.sub = 'dispatched';
       return;
     }
-    dispatch = null;
     
-    var a = place['index'] || $('form[name=form1]').attr('action') || false;
+    a = place['index'] || $('form[name=form1]').attr('action') || false;
     if(a !== false) a = a.match(/\d+/)[0];
     this.options['from_planet'] = a;
     this.options['fleet_ids']   = $('form input[name=ships]').val().split(',');
-    a = null;
+    
+    delete a,dispatch,$;
   },
   
   od_undefined: function(place){
@@ -132,11 +138,11 @@ db.moz.plugin.modules.register({
     this.sub  = place['subop'] == 'a' ? 'outbox' : 'inbox';
     
     if(this.sub == 'inbox'){
-      var page = place['page'] || 1;
+      page = place['page'] || 1;
       if(page <= 0) page = 1;
       this.options.start = (page-1) * 15;
       this.options.end   = page * 15;
-      page = null;
+      delete page;
     }
     
     var cases = {
@@ -148,7 +154,7 @@ db.moz.plugin.modules.register({
     };
     
     this.options['type'] = cases[place['nachrichtentyp']] || 'all';
-    cases = null;
+    delete cases;
   },
   
   od_planlist: function(place){
@@ -179,7 +185,7 @@ db.moz.plugin.modules.register({
       f: 'enemies'
     };
     this.options['type'] = cases[place['typ']] || 'own';
-    cases = null;
+    delete cases;
   },
   
   od_main: function(place){
@@ -188,17 +194,17 @@ db.moz.plugin.modules.register({
     this.main = 'galaxy';
     this.sub  = 'gui';
     
-    var flash = $('#Flashmain');
+    flash = $('#Flashmain');
     if(!flash.length) this.sub  = 'flash';
-    flash = null;
+    delete flash;
 
-    var html  = $('form input[name=page]');
+    html  = $('form input[name=page]');
     if(html.length > 0){
       this.sub  = 'html';
       this.options['start'] = place['first'] || 0;
       this.options['end']   = place['last']  || 30;
     }
-    html = null;
+    delete html;
     
     this.options['galaxy_id'] = $('form input[name=viewgalaxy]').val();
   },
@@ -213,7 +219,7 @@ db.moz.plugin.modules.register({
     };
     this.main = 'research';
     this.sub  = cases[place['tree']] || cases['geb'];
-    cases = null;
+    delete cases;
   },
   
   od_werft2: function(place){
@@ -250,13 +256,11 @@ db.moz.plugin.modules.register({
   },
   
   od_shop: function(place){
-    const $   = this.od.jQuery;
-    
     this.main = 'shop';
     this.sub  = 'resources';
     this.options['start'] = place['first'] || 0;
     this.options['end']   = place['last']  || 30;
-    this.options['galaxy_id'] = $('form input[name=gala]').val();
+    this.options['galaxy_id'] = this.od.jQuery('form input[name=gala]').val();
       
     var cases = {
       'checked+1': '0',
@@ -268,14 +272,14 @@ db.moz.plugin.modules.register({
     };
     
     this.options['atleast'] = cases[place['selec1']] || '0' ;
-    cases = null;
+    delete cases;
     
     var cases = {
       'checked+7': 'alliance',
       'checked+8': 'meta'
     };
     this.options['intern']  = cases[place['selec1']] || 'no' ;
-    cases = null;
+    delete cases;
   },
   
   od_shop1: function(place){
@@ -291,13 +295,11 @@ db.moz.plugin.modules.register({
   },
   
   od_trade: function(place){
-    const $   = this.od.jQuery;
-    
     this.main = 'shop';
     this.sub  = 'ships';
     this.options['start'] = place['first'] || 0;
     this.options['end']   = place['last']  || 30;
-    this.options['galaxy_id'] = $('form input[name=gala]').val();
+    this.options['galaxy_id'] = this.od.jQuery('form input[name=gala]').val();
       
     var cases = {
       'checked+1': 'all',
@@ -313,7 +315,7 @@ db.moz.plugin.modules.register({
     
     this.options['type'] = cases[place['selec1']] || 'all';
     this.options['direct'] = place['selec1'] == 'checked+10';
-    cases = null;
+    delete cases;
   },
   
   od_ptrade: function(place){
@@ -341,7 +343,7 @@ db.moz.plugin.modules.register({
     this.options['type'] = cases[place['selec1']] || 'all';
     this.options['direct'] = place['selec1'] == 'checked+11';
     this.options['auction_sale'] = $('form input[name=showzwangsversteigerung]').val();
-    cases = null;
+    delete cases,$;
   },
   
   od_logshow: function(place){
@@ -351,7 +353,7 @@ db.moz.plugin.modules.register({
       2:  'login_sitter'
     };
     this.sub  = cases['loginlog'] || 'login_counselor'; 
-    cases = null;
+    delete cases;
   },
   
   od_handp: function(place){
@@ -366,7 +368,7 @@ db.moz.plugin.modules.register({
     };
     
     this.options = cases[place['nur']] || 'all';
-    cases = null;
+    delete cases;
   },
   
   od_uberweisungen: function(place){
@@ -382,7 +384,7 @@ db.moz.plugin.modules.register({
     
     this.options['type'] = cases[place['ausgehende']] || 'incoming';
     this.options['alliance'] = place['allianzen'] == '1';
-    cases = null;
+    delete cases;
   },
   
   od_verluste: function(place){
@@ -420,11 +422,9 @@ db.moz.plugin.modules.register({
   },
   
   od_to: function(place){
-    const $   = this.od.jQuery;
-    
     this.main = 'quest';
     this.sub  = 'main';
-    this.options['galaxy_id'] = $('form input[name=gala]').val();
+    this.options['galaxy_id'] = this.od.jQuery('form input[name=gala]').val();
   },
   
   od_scanner: function(place){
@@ -450,7 +450,7 @@ db.moz.plugin.modules.register({
       t:    'trading'
     };
     this.sub = cases[place['sub']] || 'total';
-    cases = null;
+    delete cases;
     
     this.options['start'] = place['first'] || 0;
     this.options['end']   = place['last']  || 30;
@@ -495,10 +495,10 @@ db.moz.plugin.modules.register({
     this.sub  = 'statistics';
   },
   
-  od_allyshow: function(place){
+  od_alliances: function(place){
     this.main = 'alliance';
     this.sub  = 'overview';
-    this.options['alliance_id'] = place['welch'];
+    this.options['alliance_id'] = match[2];
   },
   
   od_meta: function(place){
