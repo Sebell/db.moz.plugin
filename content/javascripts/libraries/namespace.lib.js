@@ -1,16 +1,3 @@
-/* 
-Script: Namespace.js
-	Namespace utility
-
-Copyright:
-	Copyright (c) 2009 Maxime Bouroumeau-Fuseau
-
-License:
-	MIT-style license.
-	
-Version:
-	1.1
-*/
 var Namespace = (function() {
 
 	var _listeners = {};

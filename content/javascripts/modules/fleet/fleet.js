@@ -28,8 +28,8 @@ db.moz.plugin.modules.register({
   },
   
   is_fleet_overview:function(){
-    const l = this.modules.location;
-    return l.main == 'fleet' && l.sub == 'overview'; 
+    const loc = this.modules.location;
+    return loc.main == 'fleet' && loc.sub == 'overview'; 
   },
   
   select_same: function(fleet_id,event){
@@ -39,54 +39,46 @@ db.moz.plugin.modules.register({
 
     this.select_reset();
 
-    var element = $('input[type=checkbox][value="'+fleet_id+'"]');
+    element = $('input[type=checkbox][value="'+fleet_id+'"]');
     // retrieving place and time
-    var place = null, time = null, counter = 0;
+//    var place = null, time = null, counter = 0;
     place = element.parents('tr:eq(0)').find('td:eq(2)').html();
     time  = element.parents('tr:eq(0)').find('td:eq(4)').html();
+    counter = 0;
     
     // now select all checkboxes which have this location
-    var parent_form = element.parents('form:eq(0)');
+    parent_form = element.parents('form:eq(0)');
     
     parent_form.find('tr:visible').each(function(i,e){
-      var e = $(e);
-      var box = e.find('input[type=checkbox]');
+      e = $(e);
+      box = e.find('input[type=checkbox]');
       if(!box.length) return true;
       
       if(!(place == e.find('td:eq(2)').html() && time == e.find('td:eq(4)').html())) return true;
       box.attr('checked',true);
       counter++;
-      e = null;
-      box = null;
+      delete e,box;
     });
-    place = null;
-    time = null;
+    delete place,time;
     
     // show send window, if event was set
     if(!event) return;
 
     // set new input button with the number of selected fleets
-    var offset = element.offset(), 
-        send = $('#dbMozPluginFleetQuickSend').empty()
-               .append(self.template('sendWindowInput',counter));
-    counter = null;
+    offset = element.offset(); 
+    send = $('#dbMozPluginFleetQuickSend').empty().append(self.template('sendWindowInput',counter));
+    delete counter;
 
-    var button = send.css({
-      // align left from the checkbox and on the same height 
-      top: offset.top, left: (offset.left - send.width() - element.width()) 
-    }).show().find(':button');
-    element = null;
-    offset = null;
-    send = null;
+    // align left from the checkbox and on the same height 
+    button = send.css({top: offset.top, left: (offset.left - send.width() - element.width())}).show().find(':button');
+    delete element,offset,send;
     
     // Bug#6: 
     // $('form:first').submit();
     // has no effect, im not sure why, but it won't work,
     // therefore we have to inject the onclick event
-
-    var name = parent_form.attr('name');
-    button.attr('onclick','document.'+name+'.submit();');
-    name = null;
+    button.attr('onclick','document.'+parent_form.attr('name')+'.submit();');
+    delete button;
   },
   
   select_reset: function(){
@@ -107,19 +99,19 @@ db.moz.plugin.modules.register({
     const $    = this.od.jQuery;
     const self = this;
 
-    var form = $('form[name="AllyFlform"]');
+    form = $('form[name="AllyFlform"]');
     if(!form.length) return;
 
     form.find('tr.tablecolor input:submit').each(function(i,e){
-      var s = $(self.template('unselectButton'));
+      s = $(self.template('unselectButton'));
       s.click(function(){
         self.select_reset();
       });
 
       $(e).parents('td:eq(0)').prepend(s);
-      s = null;
+      delete s;
     });
-    form = null;
+    delete form;
   },
 
   gui_overview_extending_checkboxes: function(){
@@ -146,8 +138,8 @@ db.moz.plugin.modules.register({
 
     const $ = this.od.jQuery;
 
-    var e = $('#maincontent td.messageBox_Middle:first td');
-    var pid = this.modules.location.options['from_planet'];
+    e = $('#maincontent td.messageBox_Middle:first td');
+    pid = this.modules.location.options['from_planet'];
     
     if(!pid || !e.length) return;
     
@@ -155,8 +147,7 @@ db.moz.plugin.modules.register({
     $('#dbMozPluginDispatchMenuSelections').append(
       this.template('goToOrbitLink',pid)
     );
-    e = null;
-    pid = null;
+    delete e,pid;
   },
 
   gui_overview_extending_hide_merged_ships: function(){
@@ -168,22 +159,21 @@ db.moz.plugin.modules.register({
     
     $('#div3 table tr:eq(1) td').append(self.template('hiddenShips'));
 
-    var is_fleet_hidden = false,
-        link = $('#dbMozPluginHiddenShips').find('a').click(function(){
-          toggle_merged_fleets();
-        });
+    is_fleet_hidden = false;
+    link = $('#dbMozPluginHiddenShips').find('a').click(function(){
+        toggle_merged_fleets();
+    });
 
-    var toggle_merged_fleets = function(){
-      var number_of_hidings = 0;
+    toggle_merged_fleets = function(){
+      number_of_hidings = 0;
 
       $('#div3 table table table:first tr').each(function(){
-        // check if galaxy is set
-        // if not, ship belongs to a fleet
-        var is_merged = !$(this).find('td:eq(2)').text();
+        // check if galaxy is set if not, ship belongs to a fleet
+        is_merged = !$(this).find('td:eq(2)').text();
 
         // is ship merged in fleet?
         if(!is_merged) return;
-        is_merged = null;
+        delete is_merged;
   
         if(is_fleet_hidden) $(this).show();
         else $(this).hide();
@@ -193,32 +183,28 @@ db.moz.plugin.modules.register({
 
       is_fleet_hidden = !is_fleet_hidden;
 
-      var text = is_fleet_hidden ? 'showHiddenShips' : 'hideMergedShips';
+      text = is_fleet_hidden ? 'showHiddenShips' : 'hideMergedShips';
       link.html(self.template(text,number_of_hidings));
-      number_of_hidings = null;
-      text = null;
+      delete number_of_hidings,text;
     }
 
     toggle_merged_fleets();
-    is_fleet_hidden = null;
 
   },
 
   gui_dispatch_menu_extending_focus_direct_input: function(){
-    if(true !== this.lib.preferences.get('preferences.fleet.focusDirectInput'))
-      return;
-
+    if(true !== this.lib.preferences.get('preferences.fleet.focusDirectInput')) return;
     const $ = this.od.jQuery;
 
     /* yet another case where a jQuery build in function won't 
      * do what it should do:
      *   $('selector').focus();
      */
-    var input = $('input[name=direktid]').get(0);
+    input = $('input[name=direktid]').get(0);
     if(!input) return;
 
     input.focus();
-    input = null;
+    delete input;
   },
 
   od_overview: function(){

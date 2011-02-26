@@ -32,21 +32,19 @@ db.moz.plugin.modules.register({
   retrieve_shortcuts: function(){
     const prefs = this.lib.preferences;
 
-    var branch = prefs.get_branch('preferences.shortcuts.orbit.'),
-        childs = branch.get_children();
+    branch = prefs.get_branch('preferences.shortcuts.orbit.');
+    childs = branch.get_children();
 
     // load shortcut modifiers as keys and name as value
     for(var i = 0, len = childs.length; i < len; ++i){
-      var name = childs[i],
-          value = branch.get(name).toLowerCase();
+      name = childs[i];
+      value = branch.get(name).toLowerCase();
 
       this.shortcuts[value] = name;
       this.commands[name] = value;
-      name = null;
-      value = null;
+      delete name,value;
     }
-    branch = null;
-    childs = null;
+    delete branch,childs;
   },
 
   get_overview_bar: function(){
@@ -69,24 +67,21 @@ db.moz.plugin.modules.register({
   get_ships: function(options){
     const $ = this.od.jQuery;
     const self = this;
-    var ships = $('td[namsn]');
+    ships = $('td[namsn]');
 
     // no options -> get all ships!
     if(!options) return ships;
 
-    var start = false,
-        end = false;
+    start = false;
+    end = false;
 
     var range_avaible = (function(){
-      var range = options.range;
-
       // check if range is avaible
       // if not return true
-      if(!range) return false;
+      if(!options.range) return false;
 
-      start = range.start;
-      end   = range.end;
-      range = null;
+      start = options.range.start;
+      end   = options.range.end;
 
       // if start and end position is invalid
       // return true
@@ -99,7 +94,8 @@ db.moz.plugin.modules.register({
       // if range is not set, every ship is in range
       if(!range_avaible) return true;
 
-      var a = index >= start, b = index < end;
+      a = index >= start;
+      b = index < end;
 
       // if start and end position is set
       // return ships within range
@@ -112,9 +108,9 @@ db.moz.plugin.modules.register({
         return a && b;
       }
 
-      if(start > 0) {
+      if(start > 0)
         return a;
-      }
+      delete a;
 
       // if end position exceeded return 'exceeded'
       return b ? true : 'exceeded';
@@ -130,15 +126,15 @@ db.moz.plugin.modules.register({
       // the range
       callback = callback || function(ship){return true;}
 
-      var number_of_added_ships = 0;
-      var exceeded = false;
+      number_of_added_ships = 0;
+      exceeded = false;
 
       var select = function( index, ship ){
         // if range was exceeded, don't collect anymore
         if(exceeded) return false;
 
-        var ship_added = ship_added = callback($(ship));
-            in_range = is_in_range(number_of_added_ships);
+        ship_added = ship_added = callback($(ship));
+        in_range = is_in_range(number_of_added_ships);
 
         // abort immediately if range exceeded
         if(in_range == 'exceeded'){
@@ -150,12 +146,14 @@ db.moz.plugin.modules.register({
         if(!ship_added){
           return false;
         }
+        delete ship_added;
 
         // increase the counter of the matched ships
         number_of_added_ships++;
 
         // not in range? don't collect this ship
         if(!in_range) return false;
+        delete in_range;
 
         return true;
       }
@@ -166,19 +164,20 @@ db.moz.plugin.modules.register({
       var stack = [];
 
       ships.each(function(index,ship){
-        var selected = select(index,ship);
+        selected = select(index,ship);
 
         if(self.modules.basic.is_debug_enabled){
           // just some optical highlighting
-          var background = selected ? 'green' : 'blue';
+          background = selected ? 'green' : 'blue';
           $(ship).find('a').css('background-color',background);
+          delete background;
         }
 
         // add ship to the new stack
         if(selected){
           stack.push(ship);
         }
-        selected = null;
+        delete selected;
 
         // abort collection if exceeded!
         if(exceeded){
@@ -190,15 +189,13 @@ db.moz.plugin.modules.register({
       return $(stack);
     }
     
-    var filter = options['filter']; 
-    
+    filter = options['filter']; 
     // get all selected ships
     if(filter == 'selected'){
       return get_range(ships,function(ship){
         return ship.hasClass('tabletranslight');
       });
     }
-    
     // get all unselected ships
     if(filter == 'unselected'){
       return get_range(ships,function(ship){
@@ -206,7 +203,7 @@ db.moz.plugin.modules.register({
                ship.hasClass('tabletrans');
       });
     }
-    filter = null;
+    delete filter;
     
     // if no valid settings are found, return all ships
     // or return matched ships
@@ -215,9 +212,7 @@ db.moz.plugin.modules.register({
 
   update_gui_and_stack: function(){
     // FIXME: use native function instead
-    const dom = this.od.dom;
-
-    dom.set_action();
+    this.od.dom.set_action();
   },
 
   toggle_ship_selection: function(shipid){
@@ -226,11 +221,10 @@ db.moz.plugin.modules.register({
     // but we have to use 'set_action' after all selections to
     // update the gui and the ship stack, so that fixme is still active
 
-    const dom = this.od.dom;
     const $ = this.od.jQuery;
 
     // toggle ship selection
-    dom.clickfast(shipid);
+    this.od.dom.clickfast(shipid);
 
     // clicks won't remove ships background
     if($('#'+shipid).is('.tabletrans'))
@@ -251,51 +245,54 @@ db.moz.plugin.modules.register({
   select_ships: function(type,options){
     const self = this;
     const $ = this.od.jQuery;
-    var type = type.toLowerCase();
+    type = type.toLowerCase();
 
     // unselect all ships
     if(type == 'none'){
-      var ships = this.get_ships({filter:'selected'});
+      ships = this.get_ships({filter:'selected'});
       ships.each(function(i,e){
         var shipid = $(e).attr('id');
         self.toggle_ship_selection(shipid);
       });
+      delete ships;
       self.update_gui_and_stack();
       return;
     }
-
     // invert all ships
     if(type == 'invert'){
-      var ships = this.get_ships();
+      ships = this.get_ships();
       ships.each(function(i,e){
         var shipid = $(e).attr('id');
         self.toggle_ship_selection(shipid);
       });
+      delete ships;
       self.update_gui_and_stack();
       return;
     }
 
     // un/select all ships
     if(type == 'toggle'){
-      var selected = this.is_ship_selected();
+      selected = this.is_ship_selected();
       // if something is selected -> unselect it
       selected ? this.select_ships('none') : this.select_ships('all');
+      delete selected;
       return;
     }
 
     // get first ship
-    var range = undefined;
+    range = undefined;
     if(type == 'first'){
       range = { start: 0, end: 1 };
     }
 
-    var ships = this.get_ships({'range': range});
+    ships = this.get_ships({'range': range});
+    delete range;
 
     // toggle all matched ships
     ships.each(function(i,e){
-      var shipid = $(e).attr('id');
-      self.toggle_ship_selection(shipid);
+      self.toggle_ship_selection($(e).attr('id'));
     });
+    delete ships;
     self.update_gui_and_stack();
   },
   
@@ -309,7 +306,7 @@ db.moz.plugin.modules.register({
   get_statistics: function(){
     const $ = this.od.jQuery;
     
-    var ships  = this.get_ships();
+    ships  = this.get_ships();
     var stats = {
       length: ships.length,
       ships:  ships,
@@ -321,100 +318,67 @@ db.moz.plugin.modules.register({
       if(!stats.imgs[img]) stats.imgs[img]=0;
       stats.imgs[img]++;
     });
+    delete ships;
     
     return stats;
   },
   
   cmd_send_ships: function(){
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('all');
-
-    dom.sender();
+    if(!this.is_ship_selected()) this.select_ships('all');
+    this.od.dom.sender();
   },
 
   cmd_camouflage_ships: function(){
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('all');
-
-    dom.tarner();
+    if(!this.is_ship_selected()) this.select_ships('all');
+    this.od.dom.tarner();
   },
 
   cmd_attack_ship: function(){
     // FIXME: check if enemie ship exists
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('first');
-
-    dom.schoschip();
+    if(!this.is_ship_selected()) this.select_ships('first');
+    this.od.dom.schoschip();
   },
 
   cmd_attack_planet: function(){ 
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('first');
-
-    dom.atackplan();
+    if(!this.is_ship_selected()) this.select_ships('first');
+    this.od.dom.atackplan();
   },
   
   cmd_use_gate: function(){
     // FIXME: check if gate exists
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('all');
-
-    dom.jump();
+    if(!this.is_ship_selected()) this.select_ships('all');
+    this.od.dom.jump();
   },
   
   cmd_un_load_materials: function(){
     // FIXME: select existing transporters
-    const dom = this.od.dom;
-
-    var selected = this.is_ship_selected();
-    if(!selected) this.select_ships('all');
-
-    dom.loader();
+    if(!this.is_ship_selected()) this.select_ships('all');
+    this.od.dom.loader();
   },
   
   cmd_use_bioweapon: function(){
     // FIXME: select strongest bioweapon
-    const dom = this.od.dom;
-
-    dom.biolo();
+    this.od.dom.biolo();
   },
   
   cmd_use_emp: function(){
     // FIXME: select emp
-    const dom = this.od.dom;
-
-    dom.empfire();
+    this.od.dom.empfire();
   },
   
   cmd_scan_planet: function(){
     // FIXME: select strongest scanner, can you distinguish the power?
-    const dom = this.od.dom;
-
-    dom.scanit();
+    this.od.dom.scanit();
   },
   
   cmd_rename_ship: function(){
     // FIXME: if more than one ship was selected, do nothing!
-    const dom = this.od.dom;
-
-    dom.rename(); 
+    this.od.dom.rename(); 
   },
   
   cmd_merge_into_fleet: function(){
     // FIXME: deselect all fleets
-    const dom = this.od.dom;
-
-    dom.fleeter();
+    this.od.dom.fleeter();
   },
 
   cmd_uncamouflage: function(){
@@ -431,20 +395,22 @@ db.moz.plugin.modules.register({
   },
 
   gui_extending_shortcuts_handler: function(event){
-    var key = String.fromCharCode(event.which).toLowerCase();
+    key = String.fromCharCode(event.which).toLowerCase();
 
     // checking if key is a alphabet-sign
     if(!/\w/.test(key)) return;
 
-    var keys = this.shortcuts,
-        exists = key in keys;
+    keys = this.shortcuts;
+    exists = key in keys;
 
     // doesn't exists -> wrong key
     if(!exists) return;
+    delete exists;
 
     try{
       //cmd_<orbit-operation>
       this['cmd_'+ keys[key]]();
+      delete key,keys;
     }catch(e){
       alert('failed to load: '+ keys[key]);
     }
@@ -462,16 +428,14 @@ db.moz.plugin.modules.register({
     if(self.modules.basic.is_debug_enabled){
       //FIXME: remove me
       this.od.dom.get_ships = function(options){
-        var ships = self.get_ships(options);
-        return ships.length;
+        return self.get_ships(options).length;
       }
     }
 
     // only if it is our own orbit.
     if(this.modules.location.options['type'] != 'own') return;
 
-    var allnone = $('a[href$=aller(1);],a[href$=allerF(1);]')
-                  .attr('id','dbMozPluginAllNone');
+    var allnone = $('a[href$=aller(1);],a[href$=allerF(1);]').attr('id','dbMozPluginAllNone');
     // yeah we have ids for all fleet commands :D
     // what happens if a command and ship id matches?
     var cmds = { 
@@ -511,38 +475,39 @@ db.moz.plugin.modules.register({
         });
       }
     }
+    delete allnone;
 
     for(var key in this.commands){
-      var name = this.commands[key];
+      name = this.commands[key];
       // command is a word?
       if(!name.match(/\w/i)) continue;
 
-      var selector = cmds[key],
-          prepend = '['+ name +'] ';
+      selector = cmds[key];
+      prepend = '['+ name +'] ';
+      delete cmds;
       
       if(basics.is_function(selector)){
         selector(prepend, name);
+        delete name;
         continue;
       }
       $(selector).prepend(prepend);
+      delete selector,prepend;
     }
 
     // resize command panel and remove fixed width so that
     // the extended text won't screw up the layout
-    $('#200201').parents('table:first').css('width','700px')
-    .find('tr:first td').each(function(i,e){
+    $('#200201').parents('table:first').css('width','700px').find('tr:first td').each(function(i,e){
       $(e).removeAttr('width');
     });
 
     // registering onkey event!
     $(doc).keydown(function(event){
       // if an input element is active, do nothing
-      var active = $(doc.activeElement);
-      if(active.is(':input')) return;
+      if($(doc.activeElement).is(':input')) return;
 
       // if ctrl, alt, etc.. was pressed, do nothing
-      var special_keys = self.lib.basics.event.keys(event);
-      if(special_keys.isControl) return;
+      if(self.lib.basics.event.keys(event).isControl) return;
 
       self.gui_extending_shortcuts_handler(event);
     });
@@ -554,19 +519,19 @@ db.moz.plugin.modules.register({
 
     const $ = this.od.jQuery;
 
-    var stats = this.get_statistics();
+    stats = this.get_statistics();
     if(!stats.length) return;
 
-    var win = $('td[namsn]:first').parents('div:first'),
-        ele = $(this.template('statisticsWindow')),
-        max = stats.length;
+    ele = $(this.template('statisticsWindow'));
+    max = stats.length;
 
-    win.parents(':first').prepend(ele);
+    $('td[namsn]:first').parents('div:first').parents(':first').prepend(ele);
 
     for(var key in stats.imgs){
-      var count = stats.imgs[key];
+      count = stats.imgs[key];
       ele.append(this.template('statisticsEntry',key,count,count*100.0/max));
     }
     ele.append(this.template('statisticsLastEntry'));
+    delete stats,ele,max,count;
   }
 });

@@ -8,18 +8,20 @@ db.moz.plugin.ajax = function(){
 };
 
 db.moz.plugin.ajax.check_url = function(uri){
-  var regex = /^(\w+):/i,
-      protocol = (regex.exec(uri) || ['',''])[1];
-
   if(!uri){
     return ['requestEmptyUrl'];
   }
 
+  regex = /^(\w+):/i;
+  protocol = (regex.exec(uri) || ['',''])[1];
+  delete regex;
+  
   if(!protocol.match(/^http(|s)$/i)){
     return ['requestUnknownProtocol', protocol];
   }
+  delete protocol;
   return ['requestUrlOk'];
-}
+};
 
 db.moz.plugin.ajax.od_helper_ok = function(xhr){
   if(!xhr || !xhr.responseXML || !xhr.responseHTML || !xhr.responseHTML.$) 
@@ -28,22 +30,24 @@ db.moz.plugin.ajax.od_helper_ok = function(xhr){
   // request jQuery with loaded document
   const $ = xhr.responseHTML.$;
 
-  var auth    = $.find('odh\\:auth').text(),
-      status  = $.find('odh\\:status').text().match(/\d+/),
-      version = $.find('odh\\:version').text();
+  auth    = $.find('odh\\:auth').text();
+  status  = $.find('odh\\:status').text().match(/\d+/);
+  version = $.find('odh\\:version').text();
 
   // is odh:header present?
   if(!$ || auth == '' || !status || version == '')
     return 'responseStatusInvalid';
-
-  var status = status[0];
+  delete version;
 
   if(!auth.match(/true/))
     return 'responseStatusLogin';
+  delete auth;
 
+  status = status[0];
   if(status != '200'){
     return 'responseStatusNotOK';
   }
+  delete status;
 
   return 'responseStatusOK';
 }

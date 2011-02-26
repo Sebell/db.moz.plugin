@@ -13,7 +13,6 @@ db.moz.plugin.modules.register({
   // od informations
   is_od:              false, // if page is really an full loaded od page
   is_logged_in:       false, // determines if player is logged on
-  is_slim:            false, // is player slim?
   is_premium:         false, // is player premium?
   is_ad_page:         false, // is this page the advertisement page?
   is_sitter:          false,
@@ -71,14 +70,11 @@ db.moz.plugin.modules.register({
     this.gui_extending_logo();
     this.gui_extending_debug();
     this.gui_extending_configurator_links();
-
-    // logging variables
-
+    
     this.log('module.basic',null,true);
     this.log(this.is_od              ,'is_od');
     this.log(this.is_logged_in       ,'is_logged_in');
     this.log(this.is_premium         ,'is_premium');
-    this.log(this.is_slim            ,'is_slim');
     this.log(this.is_sitter          ,'is_sitter');
     this.log(this.is_ad_page         ,'is_ad_page');
     this.log(this.is_odhelper_enabled,'is_odhelper_enabled');
@@ -126,7 +122,6 @@ db.moz.plugin.modules.register({
     const dom = this.od.dom;
     const $   = this.od.jQuery;
 
-    this.player_panel = undefined;
     try{
       // required, in cases there the url is correct
       // but od wasn't loaded
@@ -138,7 +133,6 @@ db.moz.plugin.modules.register({
       )throw 'db.moz.plugin: not in od';
 
       this.is_od = true;
-
       // references to the player_panel 
       this.player_panel = $('body table table[width=410]');
 
@@ -166,7 +160,9 @@ db.moz.plugin.modules.register({
     status_text = status.html();
 
     this.is_premium = />Premium/i.exec(status_text) != undefined;
-    this.is_slim    = !this.is_premium;
+    if( this.is_premium == false) {
+      this.is_premium = />Startpremium/i.exec(status_text) != undefined;
+    }
     this.is_sitter  = /op=sitter/.exec(status_text) != undefined;
     delete status,status_text;
 

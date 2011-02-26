@@ -34,47 +34,23 @@ db.moz.plugin.modules.register({
     const $ = this.od.jQuery;
 
     // get reference point
-    var research_box = $('#returntim').parents('p:first');
+    research_box = $('#returntim').parent('td');
 
-    var br = research_box.find('br:last');
-    if(!br.length) return;
+    span = research_box.find('span');
+    if(!span.length) return;
 
-    // get text from br sibling
-    var text = $(br.get(0).nextSibling);
-    br = null;
-
-    // text has format: 'some_text: 123.435.565 + 123424'
-    var points = text.text().split(':');
-
-    // length must be 2, otherwise something failed 
-    if(points.length != 2) return;
-
-    // split '123.435.565 + 123424' into ['123.435.565','123424']
-    var addends = points[1].split('+');
-
+    addends = span.attr('title').split('+');
     // length must be 2, otherwise something failed
     if(addends.length != 2) return;
 
     // type cast strings to integers and sum them
-    var format = this.lib.basics.format_number,
-        x = parseInt(addends[0].replace(/[^\d]/g,'')),
-        y = parseInt(addends[1].replace(/[^\d]/g,'')),
-        sum = x + y;
-    addends = null;
-
-    // delete old entry
-    text.remove();
-
+    format = this.lib.basics.format_number;
+    x = parseInt(addends[0].replace(/[^\d]/g,''));
+    y = parseInt(addends[1].replace(/[^\d]/g,''));
+    sum = x + y;
     // append new sum
-    var text = this.template('totalResearchPoints',points[0],format(x),format(y),format(sum));
-    research_box.append(text);
+    span.html(this.template('totalResearchPoints',format(x),format(y),format(sum)));
     
-    research_box = null;    
-    points = null;
-    format = null;
-    x = null;
-    y = null;
-    sum = null;
-    text = null;
+    delete research_box,span,addends,format,x,y,sum;
   }
 });

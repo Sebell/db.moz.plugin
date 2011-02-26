@@ -53,7 +53,6 @@ db.moz.plugin.modules.register({
     this.modules.basic.log(this.deposit,'deposit');
 
     this.gui_extending_post_symbol();
-    this.gui_extending_day_tax_income();
     this.gui_extending_buildable_ships();
     this.gui_extending_buildable_buidings();
   },
@@ -74,11 +73,10 @@ db.moz.plugin.modules.register({
 
     var smallish = Math.floor(this.deposit.population / 100000);
     this.deposit.smallish_population = smallish;
-
-    var production = function(name){
+    production = function(name){
       return dom[name+'prog'] * dom[name+'faktor'] * smallish / 100;
     }
-    smallish = null;
+    smallish = null; delete smallish;
 
     this.production.ore = production('erz');
     this.production.metal = production('metall');
@@ -88,7 +86,7 @@ db.moz.plugin.modules.register({
     this.production.credits = 0; // TODO: parse dom;
     this.production.industry = 0; // TODO: parse dom;
     this.production.research = 0; // TODO: parse dom;
-    production = null;
+    delete production;
   },
 
   gui_extending_buildable_ships: function(){
@@ -208,23 +206,5 @@ db.moz.plugin.modules.register({
     delete matches;
     
     $('#lefttop').wrap('<div style="position:relative"/>').parents('div:eq(0)').prepend(this.template('postsymbol',img));
-  },
-  
-  gui_extending_day_tax_income: function(){
-    if(this.lib.preferences.get('preferences.infrastructure.dailyIncome') !== true)
-      return;
-
-    if(this.modules.location.options['scan']) return;
-    
-    const $   = this.od.jQuery;
-    const dom = this.od.dom;
-    
-    entry = $('img[src*=credits_us]:last');
-    if(!entry.length) return;
-
-    income = this.deposit.tax * 24;
-    format = this.lib.basics.format_number;
-    entry.next('font').find('b').append(' * 24 &rarr; '+ format(income));
-    delete entry,income,format;
   }
-});
+  });

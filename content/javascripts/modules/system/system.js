@@ -38,7 +38,7 @@ db.moz.plugin.modules.register({
   get_overview_bar: function(){
     const $ = this.od.jQuery;
 
-    var header = $('#dbMozPluginSystemOverviewBar');
+    header = $('#dbMozPluginSystemOverviewBar');
     if(header.length) return header;
 
     header = $('#sysid').parents('td:first');
@@ -47,7 +47,7 @@ db.moz.plugin.modules.register({
     if(!header.length)header = $('#message .messageBox_Middle');
 
     header.wrapInner(this.template('overviewBar'));
-    header = null;
+    delete header;
     return $('#dbMozPluginSystemOverviewBar');
   },
 
@@ -56,11 +56,10 @@ db.moz.plugin.modules.register({
 
     if(!this.planets.length) return;
 
-    var planet = $('#' + this.planets[0].planet_id);
-    var hover = planet.parents('a:first').attr('onMouseover');
+    planet = $('#' + this.planets[0].planet_id);
+    hover = planet.parents('a:first').attr('onMouseover');
     this.viewable = !/setter\('\s*','\s*','\s*','\s*','\s*'\)/.test(hover);
-    planet = null;
-    hover = null;
+    delete planet,hover;
   },
 
   retrieve_planets: function(){
@@ -68,26 +67,22 @@ db.moz.plugin.modules.register({
     const $ = this.od.jQuery;
 
     // system table
-    var system = $('#maincontent table[width="800"]:last');
+    system = $('#maincontent table[width="800"]:last');
     system.attr('id','system-'+this.modules.location.options.system_id);
 
     system.find('table td a img').each(function(i,e){
-      var e = $(e), pid = e.attr('id');
+      pid = $(e).attr('id');
       if(!/^\d+$/.test(pid)) return;
 
-      var text = e.parents('a:first').attr('id','planet-'+pid)
-                  .attr('onMouseover');
-      var pname = (text.match(self.regex_pname) || ['','undefined'])[1];
+      text = $(e).parents('a:first').attr('id','planet-'+pid).attr('onMouseover');
+      pname = (text.match(self.regex_pname) || ['','undefined'])[1];
 
       self.planets.push({
         planet_id: pid,
         planet_name: pname
       });
-      e = null;
-      pid = null;
-      text = null;
-      pname = null;
+      delete pid,text,pname;
     });
-    system = null;
+    delete system;
   }
 });

@@ -9,39 +9,40 @@ db.moz.plugin.templates = function(localepath){
   var self = this;
 
   this.get_template_string = function(name){
-    var string = templates[name];
+    string = templates[name];
 
     // if template is not existing, try to return local file
     if(!string) return locales[name];
 
     var matches = {}, match;
-    var regex  = /#{(.+?)}/g;
+    regex  = /#{(.+?)}/g;
 
     // maybe regex matches more than one time, therefore collect them 
     while(match = regex.exec(string)){
       matches[match[1]] = true;
     }
+    delete regex;
 
     for(var key in matches){
-      var value = locales[key];
+      value = locales[key];
       if(typeof value == 'function' || !value) continue;
 
-      var repl  = new RegExp('#{'+key+'}','g');
+      repl  = new RegExp('#{'+key+'}','g');
       string = string.replace(repl,value);
+      delete value,repl;
     }
-    return string
-  }
+    return string;
+  };
 
   this.parse = function(){
     // local_path to properties
-    var args = db.moz.plugin.basics.flatt_args(arguments);
+    args = db.moz.plugin.basics.flatt_args(arguments);
 
     if(args.length < 1){
       db.moz.plugin.console.error('templates.parse: no arguments');
       return '';
     }
     // loading the content of locales
-    var test = args[0];
     args[0] = self.get_template_string(args[0]);
 
     if(args[0] == undefined){
@@ -49,8 +50,8 @@ db.moz.plugin.templates = function(localepath){
       return '';
     }
     return db.moz.plugin.basics.sprintf.apply(null,args);
-  }
-}
+  };
+};
 
 db.moz.plugin.templates.cached = null;
 db.moz.plugin.templates.get = function(location){

@@ -19,7 +19,6 @@ db.moz.plugin.modules.register({
   od_inbox: function(){
     this.gui_fixing_favorites_sidebar();
     this.gui_extending_link_parser();
-    // both
     this.gui_fixing_input_width();
   },
 
@@ -48,12 +47,12 @@ db.moz.plugin.modules.register({
           $ = this.od.jQuery;
 
     $('form[method=post] div[style] tbody > tr').each(function(i,e){
-      var odd = i%2 == 1;
+      odd = i%2 == 1;
       if(!odd) return;
-      odd = null;
+      delete odd;
 
-      var element = $(e).find('td').attr('colspan',4),
-          html = element.html();
+      element = $(e).find('td').attr('colspan',4);
+      html = element.html();
 
       element.html(parseToLink(html,self.template('parseLink'),function(link){
         // forbid links that include an image path to an smiley,
@@ -61,19 +60,16 @@ db.moz.plugin.modules.register({
         var match = link.match(/spielgrafik/);
         return match === null;
       }));
-      element = null;
-      html = null;
+      delete element,html;
     });
   },
 
   gui_fixing_input_width: function(){
-    if(this.lib.preferences.get('preferences.comm.fixWidth') !== true)
-      return;
-
+    if(this.lib.preferences.get('preferences.comm.fixWidth') !== true) return;
     const $ = this.od.jQuery;
 
-    $('textarea[name=nachricht]').css({width: '600px'});
+    $('#maincontent table[width]:eq(0)').attr('width','90%');
     $('#maincontent table[width]:eq(1)').removeAttr('width');
+    $('textarea[name=nachricht]').css({width: '600px'});
   }
-
 });
