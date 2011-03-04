@@ -39,15 +39,14 @@ db.moz.plugin.preferences = {
       },
 
       get: function(prefname){
-        type = this.type(prefname);
-        value = undefined;
+        var type = this.type(prefname),
+            value = undefined;
 
         if(type == this.INVALID) return undefined;
 
         if(type == this.STRING) value = this.branch.getCharPref(prefname);
         if(type == this.BOOLEAN)   value = this.branch.getBoolPref(prefname);
         if(type == this.INT)    value = this.branch.getIntPref(prefname);
-        delete type;
 
         return value;
       },
@@ -77,7 +76,7 @@ db.moz.plugin.preferences = {
     // if no string is given, then return the complete preference object
     if(arguments.length == 0) return prefs;
     
-    args = db.moz.plugin.basics.flatt_args(arguments);
+    var args = db.moz.plugin.basics.flatt_args(arguments);
     // assigned was only one variable, and this variable wasn't a array.
     var complex_assigned = !(arguments.length == 1 && !(basics.is_array(arguments[0])));
     var returning = {};
@@ -91,7 +90,6 @@ db.moz.plugin.preferences = {
       if(!complex_assigned) return value;
       returning[prefname] = value;
     }
-    delete args;
     return (complex_assigned ? returning:undefined);
   },
   

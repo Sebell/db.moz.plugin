@@ -12,14 +12,12 @@ db.moz.plugin.ajax.check_url = function(uri){
     return ['requestEmptyUrl'];
   }
 
-  regex = /^(\w+):/i;
-  protocol = (regex.exec(uri) || ['',''])[1];
-  delete regex;
+  var regex = /^(\w+):/i,
+      protocol = (regex.exec(uri) || ['',''])[1];
   
   if(!protocol.match(/^http(|s)$/i)){
     return ['requestUnknownProtocol', protocol];
   }
-  delete protocol;
   return ['requestUrlOk'];
 };
 
@@ -30,24 +28,21 @@ db.moz.plugin.ajax.od_helper_ok = function(xhr){
   // request jQuery with loaded document
   const $ = xhr.responseHTML.$;
 
-  auth    = $.find('odh\\:auth').text();
-  status  = $.find('odh\\:status').text().match(/\d+/);
-  version = $.find('odh\\:version').text();
+  var auth    = $.find('odh\\:auth').text(),
+      status  = $.find('odh\\:status').text().match(/\d+/),
+      version = $.find('odh\\:version').text();
 
   // is odh:header present?
   if(!$ || auth == '' || !status || version == '')
     return 'responseStatusInvalid';
-  delete version;
 
   if(!auth.match(/true/))
     return 'responseStatusLogin';
-  delete auth;
 
   status = status[0];
   if(status != '200'){
     return 'responseStatusNotOK';
   }
-  delete status;
 
   return 'responseStatusOK';
 }

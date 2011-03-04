@@ -25,8 +25,7 @@ db.moz.plugin.modules.register({
   },
 
   gui_extending_research: function(){
-    if(this.lib.preferences.get('preferences.research.totalPoints') !== true)
-      return;
+    if(this.lib.preferences.get('preferences.research.totalPoints') !== true) return;
 
     // player is not premium? do nothing
     if(!this.modules.basic.is_premium) return;
@@ -34,23 +33,20 @@ db.moz.plugin.modules.register({
     const $ = this.od.jQuery;
 
     // get reference point
-    research_box = $('#returntim').parent('td');
-
-    span = research_box.find('span');
+    var research_box = $('#returntim').parent('td');
+    var span = research_box.find('span');
     if(!span.length) return;
 
-    addends = span.attr('title').split('+');
+    var addends = span.attr('title').split('+');
     // length must be 2, otherwise something failed
     if(addends.length != 2) return;
 
     // type cast strings to integers and sum them
-    format = this.lib.basics.format_number;
-    x = parseInt(addends[0].replace(/[^\d]/g,''));
-    y = parseInt(addends[1].replace(/[^\d]/g,''));
-    sum = x + y;
+    var format = this.lib.basics.format_number;
+    var x = parseInt(addends[0].replace(/[^\d]/g,''));
+    var y = parseInt(addends[1].replace(/[^\d]/g,''));
+    var sum = x + y;
     // append new sum
     span.html(this.template('totalResearchPoints',format(x),format(y),format(sum)));
-    
-    delete research_box,span,addends,format,x,y,sum;
   }
 });

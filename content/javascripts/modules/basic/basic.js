@@ -40,6 +40,7 @@ db.moz.plugin.modules.register({
   debug_window:       undefined,
 
   initialize: function(){
+
     // Debug enabled?
     this.is_debug_enabled = !!this.lib.preferences.get('debug.enable');
     // get extension version!
@@ -89,19 +90,19 @@ db.moz.plugin.modules.register({
   },
 
   format_time: function(time){
-    const basics = db.moz.plugin.basics;
     var matches = /(\d+):(\d+):(\d+):(\d+)/.exec(time);
     if(!matches) return false;
+    
     var ints = ['%02d:%02d:%02d:%02d'];
     for(var i=1;i<5;++i) 
       ints.push(parseInt(matches[i]));
-    matches = null;
+    
+    const basics = db.moz.plugin.basics;
     return basics.sprintf.apply(this,ints);
   },
 
   parse_time: function(time){
     var match = /(\d+):(\d+):(\d+):(\d+)/.exec(time);
-
     if(!match) return Number.NaN;
 
     //remove first element
@@ -111,16 +112,13 @@ db.moz.plugin.modules.register({
     match = this.od.jQuery(match).map(function(i,e){
       return parseInt(e) * factors[i];
     });
-    factors = null;
 
     var value = match[0] + match[1] + match[2] + match[3];
-    match = null;
     return value;
   },
 
   retrieve_od_whereabouts:function(){
     const dom = this.od.dom;
-    const $   = this.od.jQuery;
 
     try{
       // required, in cases there the url is correct
@@ -134,6 +132,7 @@ db.moz.plugin.modules.register({
 
       this.is_od = true;
       // references to the player_panel 
+      const $   = this.od.jQuery;
       this.player_panel = $('body table table[width=410]');
 
       if( this.player_panel.length ){
@@ -145,9 +144,8 @@ db.moz.plugin.modules.register({
       this.lib.console.error('modules.basic.retrieve_od_whereabouts: not in od',e);
     }
   },
-
+  
   retrieve_common_informations: function(){
-    const dom = this.od.dom;
     const $   = this.od.jQuery;
 
     // which round and world?
@@ -156,39 +154,32 @@ db.moz.plugin.modules.register({
     this.based_on = this.round_relation[this.world] || 'unknown';
 
     // retrieving player informations
-    status = this.player_panel.find('tr:eq(2) td:eq(1) font');
-    status_text = status.html();
-
+    var status_text = this.player_panel.find('tr:eq(2) td:eq(1) font').html();
     this.is_premium = />Premium/i.exec(status_text) != undefined;
     if( this.is_premium == false) {
       this.is_premium = />Startpremium/i.exec(status_text) != undefined;
     }
     this.is_sitter  = /op=sitter/.exec(status_text) != undefined;
-    delete status,status_text;
 
-    player       = this.player_panel.find('a[href*=usershow]');
+    var player       = this.player_panel.find('a[href*=usershow]');
     this.player_id   = /(\d+)/.exec(player.attr('href'))[1];
     this.player_name = player.html();
-    delete player;
 
-    alliance       = this.player_panel.find('a[href*=alliances]');
+    var alliance       = this.player_panel.find('a[href*=alliances]');
     this.alliance_id   = /(\d+)/.exec(alliance.attr('href'))[1];
     this.alliance_name = alliance.html();
-    delete alliance;
 
     if(this.based_on == 'round5'){
-      race = this.player_panel.find('a[href*="anznummer"]');
+      var race = this.player_panel.find('a[href*="anznummer"]');
       if(race.length)
       this.race_id = /anznummer=(\d+)/.exec(race.attr('href'))[1];
     }else{// this works for >=round7
-      race = this.player_panel.find('a[onclick*="op=rassen"]');
+      var race = this.player_panel.find('a[onclick*="op=rassen"]');
       this.race_id = /func=(\d+)/.exec(race.attr('onclick'))[1];
     }
-    delete race;
   },
 
   retrieve_page_status: function(){ 
-    const dom = this.od.dom;
     const $   = this.od.jQuery;
 
     // checking if the form with the name Interruptform
@@ -197,12 +188,11 @@ db.moz.plugin.modules.register({
       this.is_ad_page = !!$('form[name=Interruptform]').length;
     }catch(e){}
 
-    // reload page if ad apears. only for test purpose
-    value = this.lib.preferences.get('reload_page_if_ad');
     if(!this.is_ad_page)return;
 
+    // reload page if ad apears. only for test purpose
+    var value = this.lib.preferences.get('reload_page_if_ad');
     if(value) this.reload_page();
-    delete value;
   },
 
   reload_page: function(){
@@ -217,12 +207,11 @@ db.moz.plugin.modules.register({
     const basics = this.lib.basics;
 
     if(header){
-      template = this.template('debugHeader',message);
+      var template = this.template('debugHeader',message);
     }else{
-      template = this.template('debugMessage',label,basics.inspect(message));
+      var template = this.template('debugMessage',label,basics.inspect(message));
     }
     this.debug_window.append(template);
-    delete template;
   },
 
   /*******
@@ -230,33 +219,27 @@ db.moz.plugin.modules.register({
    *******/
 
   gui_extending_logo : function(){
-    status = this.player_panel.find('tr:eq(1) td:eq(1)');
+    var status = this.player_panel.find('tr:eq(1) td:eq(1)');
     status.find('font').wrap('<div style="float:left;"></div>');
     status.append(this.template('logo',this.extension_version));
-    delete status;
   },
 
   gui_extending_debug : function(){
-    const dom = this.od.dom;
-    const $   = this.od.jQuery;
-    const prefs = this.lib.preferences;
-
     // if debug is disabled -> return
     if(!this.is_debug_enabled){return;}
 
+    const $   = this.od.jQuery;
+    const prefs = this.lib.preferences;
     const visibilty = prefs.get('debug.visible');
 
-    debug = $('body');
-    debug.append(this.template('debugWindow'));
-    delete debug;
+    $('body').append(this.template('debugWindow'));
     this.debug_window = $('#odMozPluginDebugWindow');
     if(!visibilty) this.debug_window.hide();
 
     // adding listener for toggling
     $('#odMozPluginDebugToggler').click(function(event){
-      element = $('#odMozPluginDebugWindow').toggle();
+      var element = $('#odMozPluginDebugWindow').toggle();
       prefs.set('debug.visible',element.is(':visible'));
-      delete emelemt;
     });
   },
 
@@ -264,8 +247,7 @@ db.moz.plugin.modules.register({
     if(this.lib.preferences.get('preferences.overall.configurators') !== true)
       return;
 
-    const $   = this.od.jQuery;
-
+    const $ = this.od.jQuery;
     $('#dbMozPluginLogo').prepend(this.template('configuratorLinks'));
   }
 });

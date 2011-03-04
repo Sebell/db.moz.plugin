@@ -39,46 +39,40 @@ db.moz.plugin.modules.register({
 
     this.select_reset();
 
-    element = $('input[type=checkbox][value="'+fleet_id+'"]');
     // retrieving place and time
-//    var place = null, time = null, counter = 0;
-    place = element.parents('tr:eq(0)').find('td:eq(2)').html();
-    time  = element.parents('tr:eq(0)').find('td:eq(4)').html();
-    counter = 0;
+//  var place = null, time = null, counter = 0;
+    var element = $('input[type=checkbox][value="'+fleet_id+'"]'),
+        place = element.parents('tr:eq(0)').find('td:eq(2)').html(),
+        time  = element.parents('tr:eq(0)').find('td:eq(4)').html(),
+        counter = 0;
     
     // now select all checkboxes which have this location
     parent_form = element.parents('form:eq(0)');
     
     parent_form.find('tr:visible').each(function(i,e){
-      e = $(e);
-      box = e.find('input[type=checkbox]');
+      var e = $(e),
+          box = e.find('input[type=checkbox]');
       if(!box.length) return true;
       
       if(!(place == e.find('td:eq(2)').html() && time == e.find('td:eq(4)').html())) return true;
       box.attr('checked',true);
       counter++;
-      delete e,box;
     });
-    delete place,time;
     
     // show send window, if event was set
     if(!event) return;
 
     // set new input button with the number of selected fleets
-    offset = element.offset(); 
-    send = $('#dbMozPluginFleetQuickSend').empty().append(self.template('sendWindowInput',counter));
-    delete counter;
-
-    // align left from the checkbox and on the same height 
-    button = send.css({top: offset.top, left: (offset.left - send.width() - element.width())}).show().find(':button');
-    delete element,offset,send;
+    var offset = element.offset(), 
+        send = $('#dbMozPluginFleetQuickSend').empty().append(self.template('sendWindowInput',counter)),
+        // align left from the checkbox and on the same height 
+        button = send.css({top: offset.top, left: (offset.left - send.width() - element.width())}).show().find(':button');
     
     // Bug#6: 
     // $('form:first').submit();
     // has no effect, im not sure why, but it won't work,
     // therefore we have to inject the onclick event
     button.attr('onclick','document.'+parent_form.attr('name')+'.submit();');
-    delete button;
   },
   
   select_reset: function(){
@@ -99,19 +93,17 @@ db.moz.plugin.modules.register({
     const $    = this.od.jQuery;
     const self = this;
 
-    form = $('form[name="AllyFlform"]');
+    var form = $('form[name="AllyFlform"]');
     if(!form.length) return;
 
     form.find('tr.tablecolor input:submit').each(function(i,e){
-      s = $(self.template('unselectButton'));
+      var s = $(self.template('unselectButton'));
       s.click(function(){
         self.select_reset();
       });
 
       $(e).parents('td:eq(0)').prepend(s);
-      delete s;
     });
-    delete form;
   },
 
   gui_overview_extending_checkboxes: function(){
@@ -138,8 +130,8 @@ db.moz.plugin.modules.register({
 
     const $ = this.od.jQuery;
 
-    e = $('#maincontent td.messageBox_Middle:first td');
-    pid = this.modules.location.options['from_planet'];
+    var e = $('#maincontent td.messageBox_Middle:first td'),
+        pid = this.modules.location.options['from_planet'];
     
     if(!pid || !e.length) return;
     
@@ -147,7 +139,6 @@ db.moz.plugin.modules.register({
     $('#dbMozPluginDispatchMenuSelections').append(
       this.template('goToOrbitLink',pid)
     );
-    delete e,pid;
   },
 
   gui_overview_extending_hide_merged_ships: function(){
@@ -159,21 +150,20 @@ db.moz.plugin.modules.register({
     
     $('#div3 table tr:eq(1) td').append(self.template('hiddenShips'));
 
-    is_fleet_hidden = false;
-    link = $('#dbMozPluginHiddenShips').find('a').click(function(){
+    var is_fleet_hidden = false;
+    var link = $('#dbMozPluginHiddenShips').find('a').click(function(){
         toggle_merged_fleets();
     });
 
     toggle_merged_fleets = function(){
-      number_of_hidings = 0;
+      var number_of_hidings = 0;
 
       $('#div3 table table table:first tr').each(function(){
         // check if galaxy is set if not, ship belongs to a fleet
-        is_merged = !$(this).find('td:eq(2)').text();
+        var is_merged = !$(this).find('td:eq(2)').text();
 
         // is ship merged in fleet?
         if(!is_merged) return;
-        delete is_merged;
   
         if(is_fleet_hidden) $(this).show();
         else $(this).hide();
@@ -183,9 +173,8 @@ db.moz.plugin.modules.register({
 
       is_fleet_hidden = !is_fleet_hidden;
 
-      text = is_fleet_hidden ? 'showHiddenShips' : 'hideMergedShips';
+      var text = is_fleet_hidden ? 'showHiddenShips' : 'hideMergedShips';
       link.html(self.template(text,number_of_hidings));
-      delete number_of_hidings,text;
     }
 
     toggle_merged_fleets();
@@ -200,11 +189,10 @@ db.moz.plugin.modules.register({
      * do what it should do:
      *   $('selector').focus();
      */
-    input = $('input[name=direktid]').get(0);
+    var input = $('input[name=direktid]').get(0);
     if(!input) return;
 
     input.focus();
-    delete input;
   },
 
   od_overview: function(){

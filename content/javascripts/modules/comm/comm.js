@@ -47,12 +47,11 @@ db.moz.plugin.modules.register({
           $ = this.od.jQuery;
 
     $('form[method=post] div[style] tbody > tr').each(function(i,e){
-      odd = i%2 == 1;
+      var odd = i%2 == 1;
       if(!odd) return;
-      delete odd;
 
-      element = $(e).find('td').attr('colspan',4);
-      html = element.html();
+      var element = $(e).find('td').attr('colspan',4),
+          html = element.html();
 
       element.html(parseToLink(html,self.template('parseLink'),function(link){
         // forbid links that include an image path to an smiley,
@@ -60,7 +59,6 @@ db.moz.plugin.modules.register({
         var match = link.match(/spielgrafik/);
         return match === null;
       }));
-      delete element,html;
     });
   },
 

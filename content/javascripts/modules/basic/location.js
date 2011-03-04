@@ -74,8 +74,8 @@ db.moz.plugin.modules.register({
     if(this.lib.preferences.get('preferences.overall.closeHandler') !== true)
       return;
 
-    win = this.od.doc;
-    $ = this.od.jQuery;
+    const win = this.od.doc;
+    const $ = this.od.jQuery;
 
     // add the text '[Esc]' to all window closer
     $('a[href$=.closeDialog()]').prepend('[Esc] ');
@@ -87,7 +87,6 @@ db.moz.plugin.modules.register({
         $(e).css('visibility','hidden');
       });
     });
-    delete win,$;
   },
 
   gui_extending_disable_quickjump_overflow: function(){
@@ -98,7 +97,7 @@ db.moz.plugin.modules.register({
   },
 
   od_send: function(place){
-    $ = this.od.jQuery;
+    const $ = this.od.jQuery;
     
     this.main = 'fleet';
     this.sub  = 'dispatch_menu';
@@ -109,18 +108,16 @@ db.moz.plugin.modules.register({
     if(this.options['warning']) return;
     
     //checking if fleet was dispatched
-    dispatch = $('td#maincontent table div[style*="overflow: auto"]');
+    var dispatch = $('td#maincontent table div[style*="overflow: auto"]');
     if(dispatch.length){
       this.sub = 'dispatched';
       return;
     }
     
-    a = place['index'] || $('form[name=form1]').attr('action') || false;
+    var a = place['index'] || $('form[name=form1]').attr('action') || false;
     if(a !== false) a = a.match(/\d+/)[0];
     this.options['from_planet'] = a;
     this.options['fleet_ids']   = $('form input[name=ships]').val().split(',');
-    
-    delete a,dispatch,$;
   },
   
   od_undefined: function(place){
@@ -138,11 +135,10 @@ db.moz.plugin.modules.register({
     this.sub  = place['subop'] == 'a' ? 'outbox' : 'inbox';
     
     if(this.sub == 'inbox'){
-      page = place['page'] || 1;
+      var page = place['page'] || 1;
       if(page <= 0) page = 1;
       this.options.start = (page-1) * 15;
       this.options.end   = page * 15;
-      delete page;
     }
     
     var cases = {
@@ -154,7 +150,6 @@ db.moz.plugin.modules.register({
     };
     
     this.options['type'] = cases[place['nachrichtentyp']] || 'all';
-    delete cases;
   },
   
   od_planlist: function(place){
@@ -185,7 +180,6 @@ db.moz.plugin.modules.register({
       f: 'enemies'
     };
     this.options['type'] = cases[place['typ']] || 'own';
-    delete cases;
   },
   
   od_main: function(place){
@@ -194,17 +188,13 @@ db.moz.plugin.modules.register({
     this.main = 'galaxy';
     this.sub  = 'gui';
     
-    flash = $('#Flashmain');
-    if(!flash.length) this.sub  = 'flash';
-    delete flash;
+    if(!$('#Flashmain').length) this.sub  = 'flash';
 
-    html  = $('form input[name=page]');
-    if(html.length > 0){
+    if($('form input[name=page]').length > 0){
       this.sub  = 'html';
       this.options['start'] = place['first'] || 0;
       this.options['end']   = place['last']  || 30;
     }
-    delete html;
     
     this.options['galaxy_id'] = $('form input[name=viewgalaxy]').val();
   },
@@ -219,7 +209,6 @@ db.moz.plugin.modules.register({
     };
     this.main = 'research';
     this.sub  = cases[place['tree']] || cases['geb'];
-    delete cases;
   },
   
   od_werft2: function(place){
@@ -272,14 +261,12 @@ db.moz.plugin.modules.register({
     };
     
     this.options['atleast'] = cases[place['selec1']] || '0' ;
-    delete cases;
     
     var cases = {
       'checked+7': 'alliance',
       'checked+8': 'meta'
     };
     this.options['intern']  = cases[place['selec1']] || 'no' ;
-    delete cases;
   },
   
   od_shop1: function(place){
@@ -315,7 +302,6 @@ db.moz.plugin.modules.register({
     
     this.options['type'] = cases[place['selec1']] || 'all';
     this.options['direct'] = place['selec1'] == 'checked+10';
-    delete cases;
   },
   
   od_ptrade: function(place){
@@ -343,7 +329,6 @@ db.moz.plugin.modules.register({
     this.options['type'] = cases[place['selec1']] || 'all';
     this.options['direct'] = place['selec1'] == 'checked+11';
     this.options['auction_sale'] = $('form input[name=showzwangsversteigerung]').val();
-    delete cases,$;
   },
   
   od_logshow: function(place){
@@ -353,7 +338,6 @@ db.moz.plugin.modules.register({
       2:  'login_sitter'
     };
     this.sub  = cases['loginlog'] || 'login_counselor'; 
-    delete cases;
   },
   
   od_handp: function(place){
@@ -368,7 +352,6 @@ db.moz.plugin.modules.register({
     };
     
     this.options = cases[place['nur']] || 'all';
-    delete cases;
   },
   
   od_uberweisungen: function(place){
@@ -384,7 +367,6 @@ db.moz.plugin.modules.register({
     
     this.options['type'] = cases[place['ausgehende']] || 'incoming';
     this.options['alliance'] = place['allianzen'] == '1';
-    delete cases;
   },
   
   od_verluste: function(place){
@@ -450,7 +432,6 @@ db.moz.plugin.modules.register({
       t:    'trading'
     };
     this.sub = cases[place['sub']] || 'total';
-    delete cases;
     
     this.options['start'] = place['first'] || 0;
     this.options['end']   = place['last']  || 30;

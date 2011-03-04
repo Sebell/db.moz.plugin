@@ -39,76 +39,64 @@ db.moz.plugin.modules.register({
   },
 
   gui_extending_database_player_search: function(){
-    const prefs = this.lib.preferences,
-          $ = this.od.jQuery;
+    const prefs = this.lib.preferences;
+    if(prefs.get('preferences.player.searchInDatabase') !== true) return;
 
-    if(prefs.get('preferences.player.searchInDatabase') !== true)
-      return;
-
-    header = $('#maincontent table table tr:first td'),
-    player_id = this.modules.location.options.player_id,
-    url = prefs.get('preferences.configset.tbExtToolUserUri');
-
+    var player_id = this.modules.location.options.player_id;
     if(!player_id) return;
-
+    
+    var url = prefs.get('preferences.configset.tbExtToolUserUri');
     url = this.modules.fowapi.replace_placeholders(url,player_id);
+    
+    const $ = this.od.jQuery;
+    var header = $('#maincontent table table tr:first td');
     header.append(this.template('searchInDatabase',url));
     header.wrapInner(this.template('relativize'));
-    delete header,player_id,url;
   },
 
   gui_extending_database_alliance_search: function(){
-    const prefs = this.lib.preferences,
-          $ = this.od.jQuery;
+    const prefs = this.lib.preferences;
+    if(prefs.get('preferences.alliance.searchInDatabase') !== true) return;
 
-    if(prefs.get('preferences.alliance.searchInDatabase') !== true)
-      return;
-
-    header = $('#maincontent .view');
-    alliance_id = this.modules.location.options.alliance_id;
-    url = prefs.get('preferences.configset.tbExtToolAllyUri');
-
+    var alliance_id = this.modules.location.options.alliance_id;
     if(!alliance_id) return;
 
+    var url = prefs.get('preferences.configset.tbExtToolAllyUri');
     url = this.modules.fowapi.replace_placeholders(url,alliance_id);
+    
+    const $ = this.od.jQuery;
+    var header = $('#maincontent .view');
     header.append(this.template('searchInDatabase',url));
     header.wrapInner(this.template('relativize'));
-    delete header,alliance_id,url;
   },
 
   gui_extending_database_system_search: function(){
-    const prefs = this.lib.preferences,
-          $ = this.od.jQuery;
+    const prefs = this.lib.preferences;
+    if(prefs.get('preferences.system.searchInDatabase') !== true) return;
 
-    if(prefs.get('preferences.system.searchInDatabase') !== true)
-      return;
-
-    header = this.modules.system.get_overview_bar(),
-    system_id = this.modules.location.options.system_id,
-    url = prefs.get('preferences.configset.tbExtToolSysUri');
-
+    var system_id = this.modules.location.options.system_id;
     if(!system_id) return;
 
+    var url = prefs.get('preferences.configset.tbExtToolSysUri');
     url = this.modules.fowapi.replace_placeholders(url,system_id);
+
+    const $ = this.od.jQuery;
+    var header = this.modules.system.get_overview_bar();
     header.append(this.template('searchInDatabaseShort',url));
-    delete header,system_id,url;
   },
 
   gui_extending_database_orbit_search: function(){
-    const prefs = this.lib.preferences,
-          $ = this.od.jQuery;
+    const prefs = this.lib.preferences;
+    if(prefs.get('preferences.orbit.searchInDatabase') !== true) return;
 
-    if(prefs.get('preferences.orbit.searchInDatabase') !== true)
-      return;
-
-    header = this.modules.orbit.get_overview_bar(),
-    planet_id = this.modules.location.options.planet_id,
-    url = prefs.get('preferences.configset.tbExtToolPlanUri');
-
+    var planet_id = this.modules.location.options.planet_id;
     if(!planet_id) return;
-
+    
+    var url = prefs.get('preferences.configset.tbExtToolPlanUri');
     url = this.modules.fowapi.replace_placeholders(url,planet_id);
+
+    const $ = this.od.jQuery;
+    var header = this.modules.orbit.get_overview_bar();
     header.append(this.template('searchInDatabaseShort',url));
-    delete header,planet_id,url;
   }
 });

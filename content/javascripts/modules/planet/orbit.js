@@ -30,21 +30,19 @@ db.moz.plugin.modules.register({
   },
 
   retrieve_shortcuts: function(){
-    const prefs = this.lib.preferences;
-
-    branch = prefs.get_branch('preferences.shortcuts.orbit.');
-    childs = branch.get_children();
-
+    var branch = this.lib.preferences.get_branch('preferences.shortcuts.orbit.');
+    var childs = branch.get_children();
+    var name = false;
+    var value = false;
+    
     // load shortcut modifiers as keys and name as value
     for(var i = 0, len = childs.length; i < len; ++i){
-      name = childs[i];
-      value = branch.get(name).toLowerCase();
+      var name = childs[i];
+      var value = branch.get(name).toLowerCase();
 
       this.shortcuts[value] = name;
       this.commands[name] = value;
-      delete name,value;
     }
-    delete branch,childs;
   },
 
   get_overview_bar: function(){
@@ -59,7 +57,6 @@ db.moz.plugin.modules.register({
     if(!header.length)header = $('#message .messageBox_Middle');
 
     header.wrapInner(this.template('overviewBar'));
-    header = null;
 
     return $('#dbMozPluginOrbitOverviewBar');
   },
@@ -94,8 +91,8 @@ db.moz.plugin.modules.register({
       // if range is not set, every ship is in range
       if(!range_avaible) return true;
 
-      a = index >= start;
-      b = index < end;
+      var a = index >= start;
+      var b = index < end;
 
       // if start and end position is set
       // return ships within range
@@ -110,7 +107,6 @@ db.moz.plugin.modules.register({
 
       if(start > 0)
         return a;
-      delete a;
 
       // if end position exceeded return 'exceeded'
       return b ? true : 'exceeded';
@@ -126,15 +122,15 @@ db.moz.plugin.modules.register({
       // the range
       callback = callback || function(ship){return true;}
 
-      number_of_added_ships = 0;
-      exceeded = false;
+      var number_of_added_ships = 0;
+      var exceeded = false;
 
       var select = function( index, ship ){
         // if range was exceeded, don't collect anymore
         if(exceeded) return false;
 
-        ship_added = ship_added = callback($(ship));
-        in_range = is_in_range(number_of_added_ships);
+        var ship_added = ship_added = callback($(ship));
+        var in_range = is_in_range(number_of_added_ships);
 
         // abort immediately if range exceeded
         if(in_range == 'exceeded'){
@@ -146,14 +142,12 @@ db.moz.plugin.modules.register({
         if(!ship_added){
           return false;
         }
-        delete ship_added;
 
         // increase the counter of the matched ships
         number_of_added_ships++;
 
         // not in range? don't collect this ship
         if(!in_range) return false;
-        delete in_range;
 
         return true;
       }
@@ -164,20 +158,18 @@ db.moz.plugin.modules.register({
       var stack = [];
 
       ships.each(function(index,ship){
-        selected = select(index,ship);
+        var selected = select(index,ship);
 
         if(self.modules.basic.is_debug_enabled){
           // just some optical highlighting
-          background = selected ? 'green' : 'blue';
+          var background = selected ? 'green' : 'blue';
           $(ship).find('a').css('background-color',background);
-          delete background;
         }
 
         // add ship to the new stack
         if(selected){
           stack.push(ship);
         }
-        delete selected;
 
         // abort collection if exceeded!
         if(exceeded){
@@ -189,7 +181,7 @@ db.moz.plugin.modules.register({
       return $(stack);
     }
     
-    filter = options['filter']; 
+    var filter = options['filter']; 
     // get all selected ships
     if(filter == 'selected'){
       return get_range(ships,function(ship){
@@ -203,7 +195,6 @@ db.moz.plugin.modules.register({
                ship.hasClass('tabletrans');
       });
     }
-    delete filter;
     
     // if no valid settings are found, return all ships
     // or return matched ships
@@ -249,50 +240,45 @@ db.moz.plugin.modules.register({
 
     // unselect all ships
     if(type == 'none'){
-      ships = this.get_ships({filter:'selected'});
+      var ships = this.get_ships({filter:'selected'});
       ships.each(function(i,e){
         var shipid = $(e).attr('id');
         self.toggle_ship_selection(shipid);
       });
-      delete ships;
       self.update_gui_and_stack();
       return;
     }
     // invert all ships
     if(type == 'invert'){
-      ships = this.get_ships();
+      var ships = this.get_ships();
       ships.each(function(i,e){
         var shipid = $(e).attr('id');
         self.toggle_ship_selection(shipid);
       });
-      delete ships;
       self.update_gui_and_stack();
       return;
     }
 
     // un/select all ships
     if(type == 'toggle'){
-      selected = this.is_ship_selected();
+      var selected = this.is_ship_selected();
       // if something is selected -> unselect it
       selected ? this.select_ships('none') : this.select_ships('all');
-      delete selected;
       return;
     }
 
     // get first ship
-    range = undefined;
+    var range = undefined;
     if(type == 'first'){
       range = { start: 0, end: 1 };
     }
 
-    ships = this.get_ships({'range': range});
-    delete range;
+    var ships = this.get_ships({'range': range});
 
     // toggle all matched ships
     ships.each(function(i,e){
       self.toggle_ship_selection($(e).attr('id'));
     });
-    delete ships;
     self.update_gui_and_stack();
   },
   
@@ -306,9 +292,10 @@ db.moz.plugin.modules.register({
   get_statistics: function(){
     const $ = this.od.jQuery;
     
-    ships  = this.get_ships();
+    var ships  = this.get_ships();
     var stats = {
       length: ships.length,
+      
       ships:  ships,
       imgs:{}
     };
@@ -318,7 +305,6 @@ db.moz.plugin.modules.register({
       if(!stats.imgs[img]) stats.imgs[img]=0;
       stats.imgs[img]++;
     });
-    delete ships;
     
     return stats;
   },
@@ -395,22 +381,19 @@ db.moz.plugin.modules.register({
   },
 
   gui_extending_shortcuts_handler: function(event){
-    key = String.fromCharCode(event.which).toLowerCase();
-
+    var key = String.fromCharCode(event.which).toLowerCase();
     // checking if key is a alphabet-sign
     if(!/\w/.test(key)) return;
 
-    keys = this.shortcuts;
-    exists = key in keys;
-
+    var keys = this.shortcuts;
+    var exists = key in keys;
     // doesn't exists -> wrong key
     if(!exists) return;
-    delete exists;
 
+    var keys = this.shortcuts;
     try{
       //cmd_<orbit-operation>
       this['cmd_'+ keys[key]]();
-      delete key,keys;
     }catch(e){
       alert('failed to load: '+ keys[key]);
     }
@@ -475,24 +458,20 @@ db.moz.plugin.modules.register({
         });
       }
     }
-    delete allnone;
 
     for(var key in this.commands){
-      name = this.commands[key];
+      var name = this.commands[key];
       // command is a word?
       if(!name.match(/\w/i)) continue;
 
-      selector = cmds[key];
-      prepend = '['+ name +'] ';
-      delete cmds;
+      var selector = cmds[key];
+      var prepend = '['+ name +'] ';
       
       if(basics.is_function(selector)){
         selector(prepend, name);
-        delete name;
         continue;
       }
       $(selector).prepend(prepend);
-      delete selector,prepend;
     }
 
     // resize command panel and remove fixed width so that
@@ -519,19 +498,18 @@ db.moz.plugin.modules.register({
 
     const $ = this.od.jQuery;
 
-    stats = this.get_statistics();
+    var stats = this.get_statistics();
     if(!stats.length) return;
 
-    ele = $(this.template('statisticsWindow'));
-    max = stats.length;
+    var ele = $(this.template('statisticsWindow'));
+    var max = stats.length;
 
     $('td[namsn]:first').parents('div:first').parents(':first').prepend(ele);
 
     for(var key in stats.imgs){
-      count = stats.imgs[key];
+      var count = stats.imgs[key];
       ele.append(this.template('statisticsEntry',key,count,count*100.0/max));
     }
     ele.append(this.template('statisticsLastEntry'));
-    delete stats,ele,max,count;
   }
 });

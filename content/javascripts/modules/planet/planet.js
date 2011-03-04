@@ -43,7 +43,7 @@ db.moz.plugin.modules.register({
 
     const $ = this.od.jQuery;
 
-    trs = $('#maincontent table tr:eq(1) table td[valign="top"] tr[id]');
+    var trs = $('#maincontent table tr:eq(1) table td[valign="top"] tr[id]');
     if(!trs.length) return;
 
     var regex = {
@@ -62,7 +62,7 @@ db.moz.plugin.modules.register({
       regex.add($(e).children('td:eq(5)').html());
     });
     
-    table = $('#maincontent table tr:eq(1) table td:eq(0)');
+    var table = $('#maincontent table tr:eq(1) table td:eq(0)');
     if( regex.stats.inva > 0)
       table.append(this.template('invacount_red',regex.stats.inva));
     else
@@ -77,6 +77,5 @@ db.moz.plugin.modules.register({
       table.append(this.template('occupierscount_red',regex.stats.occupiers));
     else
       table.append(this.template('occupierscount',regex.stats.occupiers));
-    delete table,trs,regex;
   }
 });

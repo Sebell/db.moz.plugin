@@ -9,34 +9,32 @@ db.moz.plugin.templates = function(localepath){
   var self = this;
 
   this.get_template_string = function(name){
-    string = templates[name];
+    var string = templates[name];
 
     // if template is not existing, try to return local file
     if(!string) return locales[name];
 
-    var matches = {}, match;
-    regex  = /#{(.+?)}/g;
+    var matches = {}, match,
+        regex  = /#{(.+?)}/g;
 
     // maybe regex matches more than one time, therefore collect them 
     while(match = regex.exec(string)){
       matches[match[1]] = true;
     }
-    delete regex;
 
     for(var key in matches){
-      value = locales[key];
+      var value = locales[key];
       if(typeof value == 'function' || !value) continue;
 
-      repl  = new RegExp('#{'+key+'}','g');
-      string = string.replace(repl,value);
-      delete value,repl;
+      var repl  = new RegExp('#{'+key+'}','g');
+      var string = string.replace(repl,value);
     }
     return string;
   };
 
   this.parse = function(){
     // local_path to properties
-    args = db.moz.plugin.basics.flatt_args(arguments);
+    var args = db.moz.plugin.basics.flatt_args(arguments);
 
     if(args.length < 1){
       db.moz.plugin.console.error('templates.parse: no arguments');

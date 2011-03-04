@@ -73,11 +73,10 @@ db.moz.plugin.modules.register({
 
     var smallish = Math.floor(this.deposit.population / 100000);
     this.deposit.smallish_population = smallish;
-    production = function(name){
+
+    var production = function(name){
       return dom[name+'prog'] * dom[name+'faktor'] * smallish / 100;
     }
-    smallish = null; delete smallish;
-
     this.production.ore = production('erz');
     this.production.metal = production('metall');
     this.production.tungsten = production('wolfram');
@@ -86,7 +85,6 @@ db.moz.plugin.modules.register({
     this.production.credits = 0; // TODO: parse dom;
     this.production.industry = 0; // TODO: parse dom;
     this.production.research = 0; // TODO: parse dom;
-    delete production;
   },
 
   gui_extending_buildable_ships: function(){
@@ -109,15 +107,13 @@ db.moz.plugin.modules.register({
     // due to users can close and open the window more than once,
     // we have to rebind the event afterwards
 
-    append_values = function(){
+    var append_values = function(){
       $('a[onclick^=buildship]').each(function(i,e){
-        e = $(e);
-        e.parents('td:first').prepend(self.template('numberBuildableShips',self.get_minimal_material(e)));
-        delete e;
+        $(e).parents('td:first').prepend(self.template('numberBuildableShips',self.get_minimal_material($(e))));
       });
     }
 
-    rebind = function(){
+    var rebind = function(){
       // let the event only be called once
       var window = $('#shipDialog_c');
       window.one('DOMNodeInserted',function(){
@@ -127,7 +123,6 @@ db.moz.plugin.modules.register({
       });
     }
     rebind();
-    delete rebind,append_values;
   },
 
   gui_extending_buildable_buidings: function(){
@@ -140,22 +135,19 @@ db.moz.plugin.modules.register({
 
     var append_values = function(){
       $('img[onclick^=planet_techklick]').each(function(i,e){
-        e = $(e);
-        min = self.get_minimal_material(e);
+        var e = $(e);
+        var min = self.get_minimal_material(e);
 
-        regex = /planet_picover\((.+?), '(.+?)', '(.+?)'\)/,
-        pic_hover = e.attr('onmouseover') || '',
-        match = pic_hover.match(regex) || [,'',''];
-        delete regex, pic_hover;
+        var regex = /planet_picover\((.+?), '(.+?)', '(.+?)'\)/,
+            pic_hover = e.attr('onmouseover') || '',
+            match = pic_hover.match(regex) || [,'',''];
         
         // delete first element
         match.shift();
 
         match[1] = self.template('numberBuildableBuildings',min) + match[1];
         e.attr('onmouseover','planet_picover(' + match[0] + ",'" + match[1] + "','" + match[2] + "')");
-        delete match;
       });
-      delete e;
     }
     append_values();
   },
@@ -163,12 +155,11 @@ db.moz.plugin.modules.register({
   
   get_minimal_material: function(e){
     const self = this;
-    min = Number.MAX_VALUE;
+    var min = Number.MAX_VALUE;
 
     ress_min = function(dividend,divisor){
-      tmp = divisor == 0? Number.MAX_VALUE : dividend / divisor;
-      min = Math.min(min,tmp);
-      delete tmp;
+      var tmp = divisor == 0? Number.MAX_VALUE : dividend / divisor;
+      var min = Math.min(min,tmp);
     }
 
     ress_min(self.deposit.credits, e.attr('credits'));
@@ -178,7 +169,6 @@ db.moz.plugin.modules.register({
     ress_min(self.deposit.tungsten, e.attr('wolfram'));
     ress_min(self.deposit.fluoride, e.attr('flour'));
 
-    delete ress_min;
     return min;
   },
 
@@ -186,9 +176,8 @@ db.moz.plugin.modules.register({
     var match = text.match(/(picover\(\d+,\s+')(.+?)(')/);
     if(!match) return text;
 
-    min = this.get_minimal_material(img);
-    factor = this.template('numberBuildableShips',min);
-    delete min;
+    var min = this.get_minimal_material(img);
+    var factor = this.template('numberBuildableShips',min);
 
     return match[1] + factor + match[2] + match[3] + ",'')";
   },
@@ -201,9 +190,8 @@ db.moz.plugin.modules.register({
     const dom = this.od.dom;
     const img = dom['old'];
     
-    matches = /post.gif/.test(img);
+    var matches = /post.gif/.test(img);
     if(!matches) return;
-    delete matches;
     
     $('#lefttop').wrap('<div style="position:relative"/>').parents('div:eq(0)').prepend(this.template('postsymbol',img));
   }

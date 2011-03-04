@@ -24,8 +24,7 @@ db.moz.plugin.parser = {
         win = content;
       }
       var ifRequestor = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor);
-      webNav = ifRequestor.getInterface(Components.interfaces.nsIWebNavigation);
-      delete win,ifRequestor;
+      var webNav = ifRequestor.getInterface(Components.interfaces.nsIWebNavigation);
     } catch(err) {
       // If nsIWebNavigation cannot be found, just get the one for the whole window...
       webNav = getWebNavigation();
@@ -34,7 +33,6 @@ db.moz.plugin.parser = {
       var PageLoader = webNav.QueryInterface(Components.interfaces.nsIWebPageDescriptor);
       var pageCookie = PageLoader.currentDescriptor;
       var shEntry = pageCookie.QueryInterface(Components.interfaces.nsISHEntry);
-      delete webNav,PageLoader,pageCookie;
     } catch(err) {
       // If no page descriptor is available, just use the URL...
     }
@@ -43,7 +41,6 @@ db.moz.plugin.parser = {
     var urlCharset = doc.characterSet;
     var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
     var channel = ios.newChannel( url, urlCharset, null );
-    delete doc,url,urlCharset;
     channel.loadFlags |= Components.interfaces.nsIRequest.VALIDATE_NEVER;
     channel.loadFlags |= Components.interfaces.nsIRequest.LOAD_FROM_CACHE;
   //    channel.loadFlags |= Components.interfaces.nsICachingChannel.LOAD_ONLY_FROM_CACHE;
@@ -55,7 +52,6 @@ db.moz.plugin.parser = {
     } catch(e) {}
   
     var stream = channel.open();
-    delete channel;
     const scriptableStream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
     scriptableStream.init( stream );
   
@@ -67,7 +63,6 @@ db.moz.plugin.parser = {
     } catch(e) {}
     scriptableStream.close();
     stream.close();
-    delete stream,scriptableStream;
     return s;
   },
 
@@ -194,7 +189,6 @@ db.moz.plugin.parser = {
       notifier.notify(status);
       return false;
     }
-    delete status;
 
     notifier.notify('parserGetSource');
     var source = this.getSourceFromPage(doc);
@@ -223,7 +217,6 @@ db.moz.plugin.parser = {
       input.val(source);
 
       var form = input.parents('form:first');
-      delete input;
 
       if(!form.length){
         notifier.notify('parserTargetFormNotFound',inputName);
@@ -238,13 +231,10 @@ db.moz.plugin.parser = {
 
       notifier.notify('parserTargetOnSubmit');
       form.get(0).submit();
-      delete form;
     },function(timeout){
       var mess = timeout? 'parserTimeout' : 'parserFailure';
       notifier.notify(mess);
-      delete mess;
     });
-    delete source;
 
     return true;
   },
@@ -259,7 +249,6 @@ db.moz.plugin.parser = {
         postBody = {check: 'yes'};
 
     postBody[inputName] = source;
-    delete source,inputName;
 
     new ajax(parserUri, {
       method: 'post',
@@ -273,7 +262,6 @@ db.moz.plugin.parser = {
         alert('retrieveFormEntries: failure');
       }
     });
-    delete parserUri,postBody;
   },
 
   copyToClipboard: function(source, notifier){
@@ -327,9 +315,7 @@ db.moz.plugin.parser = {
       // get source
       var source = this.getSourceFromPage(doc);
       this.copyToClipboard(source);
-      delete source;
     }
-    delete doc,already_copied;
   },
 
   is_disabled: function(){

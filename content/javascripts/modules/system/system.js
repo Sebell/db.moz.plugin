@@ -38,16 +38,14 @@ db.moz.plugin.modules.register({
   get_overview_bar: function(){
     const $ = this.od.jQuery;
 
-    header = $('#dbMozPluginSystemOverviewBar');
+    var header = $('#dbMozPluginSystemOverviewBar');
     if(header.length) return header;
 
     header = $('#sysid').parents('td:first');
-
     // input not found? maybe planet is not existing anymore
-    if(!header.length)header = $('#message .messageBox_Middle');
+    if(!header.length) header = $('#message .messageBox_Middle');
 
     header.wrapInner(this.template('overviewBar'));
-    delete header;
     return $('#dbMozPluginSystemOverviewBar');
   },
 
@@ -56,10 +54,9 @@ db.moz.plugin.modules.register({
 
     if(!this.planets.length) return;
 
-    planet = $('#' + this.planets[0].planet_id);
-    hover = planet.parents('a:first').attr('onMouseover');
+    var planet = $('#' + this.planets[0].planet_id);
+    var hover = planet.parents('a:first').attr('onMouseover');
     this.viewable = !/setter\('\s*','\s*','\s*','\s*','\s*'\)/.test(hover);
-    delete planet,hover;
   },
 
   retrieve_planets: function(){
@@ -67,22 +64,20 @@ db.moz.plugin.modules.register({
     const $ = this.od.jQuery;
 
     // system table
-    system = $('#maincontent table[width="800"]:last');
+    var system = $('#maincontent table[width="800"]:last');
     system.attr('id','system-'+this.modules.location.options.system_id);
 
     system.find('table td a img').each(function(i,e){
-      pid = $(e).attr('id');
+      var pid = $(e).attr('id');
       if(!/^\d+$/.test(pid)) return;
 
-      text = $(e).parents('a:first').attr('id','planet-'+pid).attr('onMouseover');
-      pname = (text.match(self.regex_pname) || ['','undefined'])[1];
+      var text = $(e).parents('a:first').attr('id','planet-'+pid).attr('onMouseover');
+      var pname = (text.match(self.regex_pname) || ['','undefined'])[1];
 
       self.planets.push({
         planet_id: pid,
         planet_name: pname
       });
-      delete pid,text,pname;
     });
-    delete system;
   }
 });

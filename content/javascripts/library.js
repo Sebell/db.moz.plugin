@@ -11,12 +11,13 @@
   for(var key in libs){
     loader.loadSubScript( path + libs[key] + '.lib.js');
   }
-  delete libs;
+  libs = null;
 
   // here loading the other libraries
   libs    = ['jQuery','preferences','locations','locales',
                    'modules','ajax','templates','notifier','parser','gui'];
   const require = db.moz.plugin.require;
   require.library(libs);
-  delete libs;
+  libs = null;
+
 })();
