@@ -32,13 +32,15 @@ db.moz.plugin.modules.register({
     this.system_viewable = this.modules.system.viewable;
     this.gui_extending_fow(location.options.system_id);
 
-    basic.log('modules.fowapi',null,true);
-    basic.log(this.system_viewable,'system_viewable');
+    if(basic.is_debug_enabled) {
+        basic.log('modules.fowapi',null,true);
+        basic.log(this.system_viewable,'system_viewable');
+    }
   },
   
   replace_placeholders: function(string,id){
     const holders = this.modules.basic;
-    return string.replace('%s', id || '%s').replace('%w', holders.retrieve_world() || '%w').replace('%h', holders.host || '%h');
+    return string.replace('%s', id || '%s').replace('%w', holders.world || '%w').replace('%h', holders.host || '%h');
   },
   
   format_scan_date: function(time,scantype){
@@ -354,6 +356,7 @@ db.moz.plugin.modules.register({
   },
 
   gui_extending_append_fow_window: function(){
+    const $ = this.od.jQuery;
     $('body').append(this.template('statusWindow'));
     this.window = this.od.jQuery('#dbMozPluginFowWindow');
   },

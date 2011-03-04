@@ -65,7 +65,6 @@ db.moz.plugin.runner = function(dom, doc){
           }
           return false;
         };
-
         module.initialize();
 
         this.modules[module_name] = module;
