@@ -40,7 +40,6 @@ db.moz.plugin.modules.register({
     this.select_reset();
 
     // retrieving place and time
-//  var place = null, time = null, counter = 0;
     var element = $('input[type=checkbox][value="'+fleet_id+'"]'),
         place = element.parents('tr:eq(0)').find('td:eq(2)').html(),
         time  = element.parents('tr:eq(0)').find('td:eq(4)').html(),
@@ -81,7 +80,7 @@ db.moz.plugin.modules.register({
     
     $('#dbMozPluginFleetQuickSend').hide();
     
-    $('input[type=checkbox]').each(function(i,e){
+    $('input[type=checkbox]:checked').each(function(i,e){
       $(e).attr('checked',false);
     });
   },

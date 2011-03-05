@@ -159,9 +159,9 @@ db.moz.plugin.modules.register({
     const self = this;
     var min = Number.MAX_VALUE;
 
-    ress_min = function(dividend,divisor){
+    var ress_min = function(dividend,divisor){
       var tmp = divisor == 0? Number.MAX_VALUE : dividend / divisor;
-      var min = Math.min(min,tmp);
+      min = Math.min(min,tmp);
     }
 
     ress_min(self.deposit.credits, e.attr('credits'));
